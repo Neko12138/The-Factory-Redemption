@@ -8,7 +8,9 @@ class Platformer extends Phaser.Scene {
         this.ACCELERATION = 500;
         this.DRAG = 700;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
-        this.JUMP_VELOCITY = -900;
+        this.JUMP_VELOCITY = -545;
+
+        this.canDoubleJump = false;
     }
 
     create() {
@@ -30,6 +32,8 @@ class Platformer extends Phaser.Scene {
         this.groundLayer = this.map.createLayer("Layer_1", tilesets, 0, 0);
         this.groundLayer.setScale(2.0);
         this.groundLayer.setCollisionByProperty({ collides: true });
+        this.backgroundLayer = this.map.createLayer("Layer_0", tilesets, 0, 0);
+        this.backgroundLayer.setScale(2.0);
 
         // Make it collidable
         this.groundLayer.setCollisionByProperty({
@@ -51,6 +55,13 @@ class Platformer extends Phaser.Scene {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
+
+        // cam edge
+        this.cameras.main.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
+        this.cameras.main.startFollow(my.sprite.player, true, 0.1, 0.1);
+
+        // world edge
+        this.physics.world.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
 
     }
 
@@ -76,13 +87,19 @@ class Platformer extends Phaser.Scene {
 
         // player jump
         // note that we need body.blocked rather than body.touching b/c the former applies to tilemap tiles and the latter to the "ground"
-        if(!my.sprite.player.body.blocked.down) {
-            my.sprite.player.anims.play('jump');
+        if (my.sprite.player.body.blocked.down) {
+            this.canDoubleJump = true; // reset doubleJump
         }
-        if(my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
-            my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
-            // TODO: set a Y velocity to have the player "jump" upwards (negative Y direction)
 
+
+        if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
+            if (my.sprite.player.body.blocked.down) {
+                my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+            } else if (this.canDoubleJump) {
+                my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+                this.canDoubleJump = false;
+            }
         }
+
     }
 }
