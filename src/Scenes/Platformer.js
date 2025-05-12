@@ -5,7 +5,7 @@ class Platformer extends Phaser.Scene {
 
     init() {
         // variables and settings
-        this.ACCELERATION = 500;
+        this.ACCELERATION = 1500;
         this.DRAG = 700;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
         this.JUMP_VELOCITY = -545;
@@ -14,13 +14,9 @@ class Platformer extends Phaser.Scene {
     }
 
     create() {
-        // Create a new tilemap game object which uses 18x18 pixel tiles, and is
-        // 45 tiles wide and 25 tiles tall.
         this.map = this.make.tilemap({ key: "platformer-map" });
 
-        // Add a tileset to the map
-        // First parameter: name we gave the tileset in Tiled
-        // Second parameter: key for the tilesheet (from this.load.image in Load.js)
+
         let tileset1 = this.map.addTilesetImage("tilemap_packed", "tilemap_tiles");
         let tileset2 = this.map.addTilesetImage("tilemap_packed_base", "tilemap_base");
         let tileset3 = this.map.addTilesetImage("tilemap_packed_food", "tilemap_food");
@@ -43,6 +39,8 @@ class Platformer extends Phaser.Scene {
         // set up player avatar
         my.sprite.player = this.physics.add.sprite(game.config.width/4, game.config.height/2, "platformer_characters", "tile_0000.png").setScale(SCALE)
         my.sprite.player.setCollideWorldBounds(true);
+
+        my.sprite.player.body.setMaxVelocity(300, 1000); 
 
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
@@ -67,13 +65,13 @@ class Platformer extends Phaser.Scene {
 
     update() {
         if(cursors.left.isDown) {
-            // TODO: have the player accelerate to the left
+
             my.sprite.player.body.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
             my.sprite.player.anims.play('walk', true);
 
         } else if(cursors.right.isDown) {
-            // TODO: have the player accelerate to the right
+
             my.sprite.player.body.setAccelerationX(this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             my.sprite.player.anims.play('walk', true);
