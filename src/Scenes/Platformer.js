@@ -60,7 +60,8 @@ class Platformer extends Phaser.Scene {
 
         // world edge
         this.physics.world.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
-
+        
+        
     }
 
     update() {
