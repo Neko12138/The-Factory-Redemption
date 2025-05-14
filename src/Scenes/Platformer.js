@@ -6,10 +6,10 @@ class Platformer extends Phaser.Scene {
     init() {
         // variables and settings
         this.ACCELERATION = 1500;
-        this.DRAG = 700;    // DRAG < ACCELERATION = icy slide
+        this.DRAG = 2000;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
-        this.JUMP_VELOCITY = -545;
-
+        this.JUMP_VELOCITY = -365;
+        this.SCALE = 2.0;
         this.canDoubleJump = false;
     }
 
@@ -26,10 +26,10 @@ class Platformer extends Phaser.Scene {
 
         // Create a layer
         this.groundLayer = this.map.createLayer("Layer_1", tilesets, 0, 0);
-        this.groundLayer.setScale(2.0);
+        //this.groundLayer.setScale(2.0);
         this.groundLayer.setCollisionByProperty({ collides: true });
         this.backgroundLayer = this.map.createLayer("Layer_0", tilesets, 0, 0);
-        this.backgroundLayer.setScale(2.0);
+        //this.backgroundLayer.setScale(2.0);
 
         // Make it collidable
         this.groundLayer.setCollisionByProperty({
@@ -37,10 +37,10 @@ class Platformer extends Phaser.Scene {
         });
 
         // set up player avatar
-        my.sprite.player = this.physics.add.sprite(game.config.width/4, game.config.height/2, "platformer_characters", "tile_0000.png").setScale(SCALE)
+        my.sprite.player = this.physics.add.sprite(game.config.width/8, game.config.height/4, "platformer_characters", "tile_0000.png").setScale(1)
         my.sprite.player.setCollideWorldBounds(true);
 
-        my.sprite.player.body.setMaxVelocity(300, 1000); 
+        my.sprite.player.body.setMaxVelocity(150, 500); 
 
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
@@ -55,11 +55,43 @@ class Platformer extends Phaser.Scene {
         }, this);
 
         // cam edge
-        this.cameras.main.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
+        this.cameras.main.setZoom(this.SCALE);
+        this.cameras.main.setBounds(0, 0, this.map.widthInPixels * 1.0, this.map.heightInPixels * 1.0);
         this.cameras.main.startFollow(my.sprite.player, true, 0.1, 0.1);
 
         // world edge
         this.physics.world.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
+
+        this.diamond = this.map.createFromObjects("obj", {
+            name: "di",
+            key: "tilemap_base_sheet",
+            frame: 67
+        });
+        this.physics.world.enable(this.diamond, Phaser.Physics.Arcade.STATIC_BODY);
+
+        this.mushroom = this.map.createFromObjects("obj", {
+            name: "mr",
+            key: "tilemap_base_sheet",
+            frame: 128
+        });
+        this.physics.world.enable(this.mushroom, Phaser.Physics.Arcade.STATIC_BODY);
+
+        this.key = this.map.createFromObjects("obj", {
+            name: "key",
+            key: "tilemap_base_sheet",
+            frame: 27
+        });
+        this.physics.world.enable(this.key, Phaser.Physics.Arcade.STATIC_BODY);
+        
+        this.physics.add.overlap(my.sprite.player, this.diamond, (obj1, obj2) => {
+            obj2.destroy(); // remove coin on overlap
+        });
+        this.physics.add.overlap(my.sprite.player, this.mushroom, (obj1, obj2) => {
+            obj2.destroy(); // remove coin on overlap
+        });
+        this.physics.add.overlap(my.sprite.player, this.key, (obj1, obj2) => {
+            obj2.destroy(); // remove coin on overlap
+        });
         
         
     }
