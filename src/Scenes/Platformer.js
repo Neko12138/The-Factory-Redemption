@@ -14,6 +14,8 @@ class Platformer extends Phaser.Scene {
     }
 
     create() {
+        this.bg = this.add.image(100, 150, "background_img").setOrigin(0).setScrollFactor(0);
+        this.bg.setDisplaySize(this.scale.width / 1.5, this.scale.height / 1.6);
         this.map = this.make.tilemap({ key: "platformer-map" });
 
 
@@ -82,6 +84,13 @@ class Platformer extends Phaser.Scene {
             frame: 27
         });
         this.physics.world.enable(this.key, Phaser.Physics.Arcade.STATIC_BODY);
+
+        this.door = this.map.createFromObjects("obj", {
+            name: "door",
+            key: "tilemap_base_sheet_2",
+            frame: 28
+        });
+        this.physics.world.enable(this.door, Phaser.Physics.Arcade.STATIC_BODY);
         
         this.physics.add.overlap(my.sprite.player, this.diamond, (obj1, obj2) => {
             obj2.destroy(); // remove coin on overlap
@@ -92,19 +101,16 @@ class Platformer extends Phaser.Scene {
         this.physics.add.overlap(my.sprite.player, this.key, (obj1, obj2) => {
             obj2.destroy(); // remove coin on overlap
         });
-        ///ssss
-        // 保存出生点
-this.spawnPoint = { x: game.config.width/8, y: game.config.height/4 };
 
-// 创建对 pWater 瓷砖的引用
-this.pWaterTiles = [];
+        this.spawnPoint = { x: game.config.width/8, y: game.config.height/4 };
 
-// 获取所有 groundLayer 上设置了 pWater 属性的 tile
-this.backgroundLayer.forEachTile(tile => {
-    if (tile.properties.pWater) {
-        this.pWaterTiles.push(tile);
-    }
-});
+        this.pWaterTiles = [];
+
+        this.backgroundLayer.forEachTile(tile => {
+            if (tile.properties.pWater) {
+                this.pWaterTiles.push(tile);
+            }
+        });
 
 
 
@@ -148,16 +154,15 @@ this.backgroundLayer.forEachTile(tile => {
         }
 
 
-        // 检查玩家是否站在 pWater tile 上
-let playerBottom = my.sprite.player.getBottomCenter();
-let playerTile = this.backgroundLayer.getTileAtWorldXY(playerBottom.x, playerBottom.y + 1, true);
+        // check play if on water
+        let playerBottom = my.sprite.player.getBottomCenter();
+        let playerTile = this.backgroundLayer.getTileAtWorldXY(playerBottom.x, playerBottom.y + 1, true);
 
-
-if (playerTile && playerTile.properties.pWater) {
-    console.log("触碰到水，重置玩家位置");
-    my.sprite.player.setPosition(this.spawnPoint.x, this.spawnPoint.y);
-    my.sprite.player.body.setVelocity(0, 0); // 清除速度
-}
+        //move player back to respawn
+        if (playerTile && playerTile.properties.pWater) {
+            my.sprite.player.setPosition(this.spawnPoint.x, this.spawnPoint.y);
+            my.sprite.player.body.setVelocity(0, 0); 
+        }
 
 
     }

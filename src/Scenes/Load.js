@@ -6,6 +6,8 @@ class Load extends Phaser.Scene {
     preload() {
         this.load.setPath("./assets/");
 
+        this.load.image("background_img", "bg_01.png");
+
         // Load characters spritesheet
         this.load.atlas("platformer_characters", "tilemap-characters-packed.png", "tilemap-characters-packed.json");
 
@@ -19,8 +21,13 @@ class Load extends Phaser.Scene {
 
         this.load.spritesheet("tilemap_base_sheet", "tilemap_packed_base.png", {
         frameWidth: 18,
-        frameHeight: 18
-    });
+        frameHeight: 18  
+        });
+
+        this.load.spritesheet("tilemap_base_sheet_2", "tilemap_packed.png", {
+        frameWidth: 18,
+        frameHeight: 18  
+        });
 
     }
 
