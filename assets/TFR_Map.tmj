@@ -262,6 +262,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"pWater",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -406,6 +411,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"pWater",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -550,6 +560,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"pWater",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {

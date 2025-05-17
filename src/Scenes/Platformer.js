@@ -92,8 +92,23 @@ class Platformer extends Phaser.Scene {
         this.physics.add.overlap(my.sprite.player, this.key, (obj1, obj2) => {
             obj2.destroy(); // remove coin on overlap
         });
-        
-        
+        ///ssss
+        // 保存出生点
+this.spawnPoint = { x: game.config.width/8, y: game.config.height/4 };
+
+// 创建对 pWater 瓷砖的引用
+this.pWaterTiles = [];
+
+// 获取所有 groundLayer 上设置了 pWater 属性的 tile
+this.backgroundLayer.forEachTile(tile => {
+    if (tile.properties.pWater) {
+        this.pWaterTiles.push(tile);
+    }
+});
+
+
+
+
     }
 
     update() {
@@ -131,6 +146,19 @@ class Platformer extends Phaser.Scene {
                 this.canDoubleJump = false;
             }
         }
+
+
+        // 检查玩家是否站在 pWater tile 上
+let playerBottom = my.sprite.player.getBottomCenter();
+let playerTile = this.backgroundLayer.getTileAtWorldXY(playerBottom.x, playerBottom.y + 1, true);
+
+
+if (playerTile && playerTile.properties.pWater) {
+    console.log("触碰到水，重置玩家位置");
+    my.sprite.player.setPosition(this.spawnPoint.x, this.spawnPoint.y);
+    my.sprite.player.body.setVelocity(0, 0); // 清除速度
+}
+
 
     }
 }
