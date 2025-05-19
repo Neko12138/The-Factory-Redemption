@@ -18,7 +18,6 @@ class Platformer extends Phaser.Scene {
         this.bg.setDisplaySize(this.scale.width / 1.5, this.scale.height / 1.6);
         this.map = this.make.tilemap({ key: "platformer-map" });
 
-
         let tileset1 = this.map.addTilesetImage("tilemap_packed", "tilemap_tiles");
         let tileset2 = this.map.addTilesetImage("tilemap_packed_base", "tilemap_base");
         let tileset3 = this.map.addTilesetImage("tilemap_packed_food", "tilemap_food");
@@ -32,6 +31,15 @@ class Platformer extends Phaser.Scene {
         this.groundLayer.setCollisionByProperty({ collides: true });
         this.backgroundLayer = this.map.createLayer("Layer_0", tilesets, 0, 0);
         //this.backgroundLayer.setScale(2.0);
+
+        const bgText1 = this.add.text(20, 130, "The water is poisonous!", {
+            fontFamily: "Arial",
+            fontSize: "12px",
+            color: "#00aa00",
+            wordWrap: { width: 300 }
+        }).setOrigin(0);
+        bgText1.setRotation(Phaser.Math.DegToRad(50));        
+
 
         // Make it collidable
         this.groundLayer.setCollisionByProperty({
@@ -64,6 +72,9 @@ class Platformer extends Phaser.Scene {
         // world edge
         this.physics.world.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
 
+
+
+        //add coll
         this.diamond = this.map.createFromObjects("obj", {
             name: "di",
             key: "tilemap_base_sheet",
