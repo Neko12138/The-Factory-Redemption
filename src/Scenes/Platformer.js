@@ -11,6 +11,7 @@ class Platformer extends Phaser.Scene {
         this.JUMP_VELOCITY = -365;
         this.SCALE = 2.0;
         this.canDoubleJump = false;
+        this.PARTICLE_VELOCITY = 50;
     }
 
     create() {
@@ -47,7 +48,7 @@ class Platformer extends Phaser.Scene {
         });
 
         // set up player avatar
-        my.sprite.player = this.physics.add.sprite(game.config.width/8, game.config.height/4, "platformer_characters", "tile_0000.png").setScale(1)
+        my.sprite.player = this.physics.add.sprite(game.config.width/8, game.config.height/4, "platformer_characters", "tile_0009.png").setScale(1)
         my.sprite.player.setCollideWorldBounds(true);
 
         my.sprite.player.body.setMaxVelocity(150, 500); 
@@ -71,8 +72,6 @@ class Platformer extends Phaser.Scene {
 
         // world edge
         this.physics.world.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
-
-
 
         //add coll
         this.diamond = this.map.createFromObjects("obj", {
@@ -124,6 +123,20 @@ class Platformer extends Phaser.Scene {
         });
 
 
+        //vfx
+        my.vfx = {}; 
+        
+        my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
+            frame: ['star_01.png', 'star_02.png' ],
+            random: true, 
+            scale: {start: 0.03, end: 0.1},
+            maxAliveParticles: 100,
+            lifespan: 350,
+
+            alpha: {start: 1, end: 0.1}, 
+        });
+
+        my.vfx.walking.stop();
 
 
     }
@@ -131,21 +144,45 @@ class Platformer extends Phaser.Scene {
     update() {
         if(cursors.left.isDown) {
 
-            my.sprite.player.body.setAccelerationX(-this.ACCELERATION);
+            my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
             my.sprite.player.anims.play('walk', true);
 
-        } else if(cursors.right.isDown) {
+            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
 
-            my.sprite.player.body.setAccelerationX(this.ACCELERATION);
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+
+            // Only play smoke effect if touching the ground
+
+            if (my.sprite.player.body.blocked.down) {
+
+                my.vfx.walking.start();
+
+            }
+
+        } else if(cursors.right.isDown) {
+            my.sprite.player.setAccelerationX(this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             my.sprite.player.anims.play('walk', true);
+            // TODO: add particle following code here
+            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
+
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+
+            // Only play smoke effect if touching the ground
+
+            if (my.sprite.player.body.blocked.down) {
+
+                my.vfx.walking.start();
+
+            }
 
         } else {
             // TODO: set acceleration to 0 and have DRAG take over
             my.sprite.player.body.setAccelerationX(0);
             my.sprite.player.body.setDragX(this.DRAG);
             my.sprite.player.anims.play('idle');
+            my.vfx.walking.stop(); 
         }
 
         // player jump
