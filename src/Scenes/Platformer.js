@@ -60,6 +60,8 @@ class Platformer extends Phaser.Scene {
         cursors = this.input.keyboard.createCursorKeys();
 
         // debug key listener (assigned to D key)
+        
+            this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
         this.input.keyboard.on('keydown-D', () => {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
