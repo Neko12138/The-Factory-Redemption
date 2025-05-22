@@ -16,6 +16,11 @@ class Platformer extends Phaser.Scene {
     }
 
     create() {
+
+        this.playingMusic = this.sound.add('playing');
+        this.playingMusic.play();
+        this.playingMusic.setVolume(0.5);
+
         this.bg = this.add.image(100, 150, "background_img").setOrigin(0).setScrollFactor(0);
         this.bg.setDisplaySize(this.scale.width / 1.5, this.scale.height / 1.6);
         this.map = this.make.tilemap({ key: "platformer-map" });
@@ -172,6 +177,7 @@ class Platformer extends Phaser.Scene {
             if (this.hasKey) {
                 this.walkSound.stop();
                 this.walkSoundPlaying = false;
+                this.playingMusic.stop();
                 this.scene.start("gameOver"); 
             }
         });

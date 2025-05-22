@@ -34,6 +34,9 @@ class Load extends Phaser.Scene {
         this.load.audio('mushroom', 'mushroom.mp3');
         this.load.audio('key', 'dimkey.mp3');
         this.load.audio('walk', 'walk.mp3');
+        this.load.audio('ending', 'ending.mp3');
+        this.load.audio('opening', 'opening.mp3');
+        this.load.audio('playing', 'playing.mp3');
 
     }
 
