@@ -12,6 +12,7 @@ class Platformer extends Phaser.Scene {
         this.SCALE = 2.0;
         this.canDoubleJump = false;
         this.PARTICLE_VELOCITY = 50;
+        this.hasKey = false;
     }
 
     create() {
@@ -46,6 +47,14 @@ class Platformer extends Phaser.Scene {
         this.groundLayer.setCollisionByProperty({
             collides: true
         });
+
+        //the door !have to before set up player!
+        this.door = this.map.createFromObjects("obj", {
+            name: "door",
+            key: "tilemap_base_sheet_2",
+            frame: 28
+        });
+        this.physics.world.enable(this.door, Phaser.Physics.Arcade.STATIC_BODY);
 
         // set up player avatar
         my.sprite.player = this.physics.add.sprite(game.config.width/8, game.config.height/4, "platformer_characters", "tile_0009.png").setScale(1)
@@ -140,27 +149,31 @@ class Platformer extends Phaser.Scene {
             frame: 27
         });
         this.physics.world.enable(this.key, Phaser.Physics.Arcade.STATIC_BODY);
-
-        this.door = this.map.createFromObjects("obj", {
-            name: "door",
-            key: "tilemap_base_sheet_2",
-            frame: 28
-        });
-        this.physics.world.enable(this.door, Phaser.Physics.Arcade.STATIC_BODY);
         
         this.physics.add.overlap(my.sprite.player, this.diamond, (obj1, obj2) => {
             obj2.destroy(); 
             this.keySound.play();
         });
+
         this.physics.add.overlap(my.sprite.player, this.mushroom, (obj1, obj2) => {
             obj2.destroy(); 
             this.mushroomSound.play();
             this.ACCELERATION = 150; 
-            this.DRAG = 300; 
+            //this.DRAG = 300; 
         });
+
         this.physics.add.overlap(my.sprite.player, this.key, (obj1, obj2) => {
             obj2.destroy(); 
             this.keySound.play();
+            this.hasKey = true;
+        });
+
+        this.physics.add.overlap(my.sprite.player, this.door, (obj1, obj2) => {
+            if (this.hasKey) {
+                this.walkSound.stop();
+                this.walkSoundPlaying = false;
+                this.scene.start("gameOver"); 
+            }
         });
 
     }
