@@ -75,6 +75,50 @@ class Platformer extends Phaser.Scene {
         // world edge
         this.physics.world.setBounds(0, 0, this.map.widthInPixels * 2.0, this.map.heightInPixels * 2.0);
 
+        // deadWater
+        this.spawnPoint = { x: game.config.width/8, y: game.config.height/4 };
+
+        this.pWaterTiles = [];
+
+        this.backgroundLayer.forEachTile(tile => {
+            if (tile.properties.pWater) {
+                this.pWaterTiles.push(tile);
+            }
+        });
+
+        //vfx
+        my.vfx = {}; 
+        
+        my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
+            frame: ['star_01.png', 'star_02.png' ],
+            random: true, 
+            scale: {start: 0.03, end: 0.06},
+            maxAliveParticles: 100,
+            lifespan: 150,
+
+            alpha: {start: 1, end: 0.1}, 
+        });
+
+        my.vfx.walking.stop();
+
+        my.vfx.jumping = this.add.particles(0, 0, "kenny-particles", {
+            frame: ['circle_03.png' ],
+            scale: {start: 0.03, end: 0.1},
+            maxAliveParticles: 1,
+            lifespan: 350,
+
+            alpha: {start: 1, end: 0.1}, 
+        });
+
+        my.vfx.jumping.stop();
+
+        //sound
+        this.walkSound = this.sound.add('walk');
+        this.walkSoundPlaying = false;
+
+        this.keySound = this.sound.add('key');
+        this.mushroomSound = this.sound.add('mushroom');
+
         //add coll
         this.diamond = this.map.createFromObjects("obj", {
             name: "di",
@@ -105,52 +149,19 @@ class Platformer extends Phaser.Scene {
         this.physics.world.enable(this.door, Phaser.Physics.Arcade.STATIC_BODY);
         
         this.physics.add.overlap(my.sprite.player, this.diamond, (obj1, obj2) => {
-            obj2.destroy(); // remove coin on overlap
+            obj2.destroy(); 
+            this.keySound.play();
         });
         this.physics.add.overlap(my.sprite.player, this.mushroom, (obj1, obj2) => {
-            obj2.destroy(); // remove coin on overlap
+            obj2.destroy(); 
+            this.mushroomSound.play();
+            this.ACCELERATION = 150; 
+            this.DRAG = 300; 
         });
         this.physics.add.overlap(my.sprite.player, this.key, (obj1, obj2) => {
-            obj2.destroy(); // remove coin on overlap
+            obj2.destroy(); 
+            this.keySound.play();
         });
-
-        this.spawnPoint = { x: game.config.width/8, y: game.config.height/4 };
-
-        this.pWaterTiles = [];
-
-        this.backgroundLayer.forEachTile(tile => {
-            if (tile.properties.pWater) {
-                this.pWaterTiles.push(tile);
-            }
-        });
-
-
-        //vfx
-        my.vfx = {}; 
-        
-        my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
-            frame: ['star_01.png', 'star_02.png' ],
-            random: true, 
-            scale: {start: 0.03, end: 0.06},
-            maxAliveParticles: 100,
-            lifespan: 150,
-
-            alpha: {start: 1, end: 0.1}, 
-        });
-
-        my.vfx.walking.stop();
-
-        my.vfx.jumping = this.add.particles(0, 0, "kenny-particles", {
-            frame: ['circle_03.png' ],
-            scale: {start: 0.03, end: 0.1},
-            maxAliveParticles: 1,
-            lifespan: 350,
-
-            alpha: {start: 1, end: 0.1}, 
-        });
-
-        my.vfx.jumping.stop();
-
 
     }
 
@@ -162,32 +173,32 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.anims.play('walk', true);
 
             my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-1, false);
-
             my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
 
-            // Only play smoke effect if touching the ground
-
             if (my.sprite.player.body.blocked.down) {
-
                 my.vfx.walking.start();
+            }
 
+            if (my.sprite.player.body.blocked.down && !this.walkSoundPlaying) {
+                this.walkSound.play({ loop: true });
+                this.walkSoundPlaying = true;
             }
 
         } else if(cursors.right.isDown) {
             my.sprite.player.setAccelerationX(this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             my.sprite.player.anims.play('walk', true);
-            // TODO: add particle following code here
-            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-15, my.sprite.player.displayHeight/2-1, false);
 
+            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-15, my.sprite.player.displayHeight/2-1, false);
             my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
 
-            // Only play smoke effect if touching the ground
-
             if (my.sprite.player.body.blocked.down) {
-
                 my.vfx.walking.start();
+            }
 
+            if (my.sprite.player.body.blocked.down && !this.walkSoundPlaying) {
+                this.walkSound.play({ loop: true });
+                this.walkSoundPlaying = true;
             }
 
         } else {
@@ -197,6 +208,11 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.anims.play('idle');
             my.vfx.walking.stop(); 
             my.vfx.jumping.stop();
+
+            if (this.walkSoundPlaying) {
+                this.walkSound.stop();
+                this.walkSoundPlaying = false;
+            }
         }
 
         // player jump
@@ -209,9 +225,11 @@ class Platformer extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
             if (my.sprite.player.body.blocked.down) {
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
-
-
-                my.vfx.walking.stop();                 
+                my.vfx.walking.stop();  
+                if (this.walkSoundPlaying) {
+                    this.walkSound.stop();
+                    this.walkSoundPlaying = false;
+                }               
             } else if (this.canDoubleJump) {
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
                 this.canDoubleJump = false;
