@@ -13,6 +13,8 @@ class Platformer extends Phaser.Scene {
         this.canDoubleJump = false;
         this.PARTICLE_VELOCITY = 50;
         this.hasKey = false;
+        this.hasDiamond = false;
+        this.hasMushroom = false;
     }
 
     create() {
@@ -158,12 +160,14 @@ class Platformer extends Phaser.Scene {
         this.physics.add.overlap(my.sprite.player, this.diamond, (obj1, obj2) => {
             obj2.destroy(); 
             this.keySound.play();
+            this.hasDiamond = true;
         });
 
         this.physics.add.overlap(my.sprite.player, this.mushroom, (obj1, obj2) => {
             obj2.destroy(); 
             this.mushroomSound.play();
             this.ACCELERATION = 150; 
+            this.hasMushroom = true;
             //this.DRAG = 300; 
         });
 
@@ -175,10 +179,12 @@ class Platformer extends Phaser.Scene {
 
         this.physics.add.overlap(my.sprite.player, this.door, (obj1, obj2) => {
             if (this.hasKey) {
-                this.walkSound.stop();
-                this.walkSoundPlaying = false;
-                this.playingMusic.stop();
-                this.scene.start("gameOver"); 
+                this.sound.stopAll();
+                this.scene.start("gameOver", {            
+                    hasDiamond: this.hasDiamond,
+                    hasMushroom: this.hasMushroom
+                }); 
+                
             }
         });
 
