@@ -1,5 +1,7 @@
-**Starter Platformer**
+The Factory Redemption
 
-A Phaser 3 code framework for creating a bare-bones 2D platformer game.
+This work is only used for homework submission or classroom education needs
 
-Visual assets provided by Kenny Assets [Pixel Platformer](https://kenney.nl/assets/pixel-platformer) asset pack, with gratitude. 
+Modified by Wade Xu (wxu78@ucsc.edu)
+
+05/23/2025
