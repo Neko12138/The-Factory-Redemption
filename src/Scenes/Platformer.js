@@ -241,7 +241,6 @@ class Platformer extends Phaser.Scene {
         }
 
         // player jump
-        // note that we need body.blocked rather than body.touching b/c the former applies to tilemap tiles and the latter to the "ground"
         if (my.sprite.player.body.blocked.down) {
             this.canDoubleJump = true; // reset doubleJump
         }

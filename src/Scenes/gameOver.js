@@ -27,7 +27,7 @@ class gameOver extends Phaser.Scene {
             fontStyle: 'italic'
         });
 
-        this.add.text(20, 650, "Press SPACE to title screen", {
+        this.add.text(20, 650, "Press SPACE to PLAY AGAIN!!!", {
             fontSize: '23px',
             fill: '#fff',
             fontFamily: 'Arial'

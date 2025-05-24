@@ -31,7 +31,7 @@ let config = {
     },
     width: 800,
     height: 720,
-    scene: [ Load, Platformer, gameOver,]
+    scene: [ ini, Load, Platformer, gameOver, gameStart, ]
 }
 
 var cursors;
